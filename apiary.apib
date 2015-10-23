@@ -1,0 +1,2898 @@
+FORMAT: 1A
+HOST: http://api.sentimentmetrics.com/
+
+# Sentiment API
+
+## Introduction
+
+The Sentiment API is based on REST principles. In order to use this API you need an active Sentiment account. The following documentation covers core resources that are available to query the Sentiment platform and manipulate data.
+All API methods return expect to have parameters passsed as JSON and will return resources as JSON. Please see specific examples for further details.
+
+## Allowed HTTP requests
+
+* **`POST`** - to create a resource
+* **`PUT`** - to replace or update a resource
+* **`GET`** - to retrieve a resource
+* **`DELETE`** - to delete a resource
+
+## Description of usual server responses
+
+* **`200 OK`** - the request was successful
+* **`201 Created`** - the request was successful and a resource was created
+* **`202 Accepted`** - the request was successful and is being processed
+* **`204 No Content`** - the request was successful but there is no resource representation to return
+* **`400 Bad Request`** - the request could not be understood or was missing required parameters
+* **`401 Unauthorized`** - authenication failed or the user doesn't have permissions for the requested operation
+* **`403 Forbidden`** - access to the requested resource was denied
+* **`404 Not Found`** - the requested resource could not be found
+* **`405 Method Not Allowed`** - the request could not be actioned as it would result in a conflict with another resource 
+* **`500 Internal Server Error`** - there was an uncaught exception in the API, please email support@sentimentmetrics.com
+
+
+# Group API Status
+
+## Status [/status]
+
+### Check API status [GET]
+
++ Request (application/json)
+
++ Response 200 (application/json)
+    + Attributes (API Status Response)
+
++ Response 404 (application/json)
+
+
+# Group Authorisation
+
+To access resources in this API, a user must first obtain an auth token.
+The user should supply thier email address and password to the **`/auth`** endpoint. The **`token`** that is returned can then be passed in the header field **`Authorization`** to allow the user access to resources.
+
+## Auth [/auth]
+
+### Authorise a user [POST]
+
+Generate an auth token for a user.
+
++ Request (application/json)
+    + Attributes (Auth Request)
+        
+        
++ Response 200 (application/json)
+    + Attributes (Auth Response)
+        
+## Auth > Logout [/auth/logout]
+
+### Deactivate an auth token [POST]
+
+This endpoint allows a valid auth token to be explicity exipred.
+
++ Request (application/json)
+    + Attributes (Auth Deactivate Request)
+
++ Response 204
+
++ Response 404
+
+        {
+            "code": 404,
+            "error": "Token not found or expired"
+        }
+
+## Auth > Forgot [/auth/forgot]
+
+### Request to reset password [POST]
+
+Supply the user email in the case of a forgotten/lost password. If the account is found then a password reset link will be sent to the user email address.
+
++ Request (application/json)
+
+        {
+            "email": "foo@bar.com"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "message": "Check your email"
+        }
+        
++ Response 404 (application/json)
+
+        {
+            "code": 404,
+            "error": "The email specified could not be found"
+        }
+
+## Auth > Reset [/auth/reset]
+
+### Reset password [POST]
+
+Supply the user email in the case of a forgotten/lost password. If the account is found then a password reset link will be sent to the user email address.
+
++ Request (application/json)
+
+        {
+            "reset_token": "VM8DhE3aJ7PTgWQu6QSEvlKTmxdWk8s8v",
+            "password": "poor_passphrase"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "message": "Password reset"
+        }
+        
++ Response 404 (application/json)
+
+        {
+            "code": 404,
+            "error": "Password reset request not found or expired"
+        }
+        
+# Group Verification
+
+## Verify [/verify]
+
+### Verify an email address [POST]
+
+On account creation an email verification is automatically generated and sent to the users supplied email address.
+Use this API to complete the verification process by supplying the verification_token within 2 hours of it's generation
+
++ Request (application/json)
+
+        {
+            "verification_token": "VM8DhE3aJ7PTgWQu6QSEvlKTmxdWk8s8v"
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "message": "Email verified",
+            "_links": {
+                "auth": {
+                    "href": "/auth"
+                }
+            }
+        }
+
++ Response 404 (application/json)
+
+        {
+            "error": "verification token not found or expired"
+        }
+
+# Group Check Email
+
+## Check Email [/check_email]
+
+### Check if email is in use [POST]
+
+The /check_email endpoint can be used for sign-up form verification. If the account exists a `204` will be returned. 
+If the account does not exist, a `404` will be returned.
+
++ Request (application/json)
+
+        {
+            "email": "foo@bar.com"
+        }
+        
++ Response 204
+
++ Response 404
+
+# Group Avatars
+
+Avatars are stored in a independant top level resource. They are then linked to resources such as `companies`, `users` and `workspace` by the following endpoints:
+
+* **`PUT /companies/{company_id}/avatar`**
+* **`PUT /users/{user_id}/avatar`**
+* **`PUT /workspace/{workspace}/avatar`**
+
+All avatars are children of the company of the user who created them. 
+
+## Avatars Collection [/avatars]
+
+### Get a list of avatars [GET]
+
+Company admins will be able to retrieve all avatars that belong to theie company, while other authorised users will only be able to retieve avatars they have created themselves.
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+    + Attributes (Avatar Collection)
+
+    + Body
+                
+            {
+                "avatars": [
+                    {
+                        "avatar_id": 1,
+                        "original_name" : "some_image.jpg",
+                        "created_by": 1,
+                        "_links": {
+                            "self": { "href": "/avatar/1" }
+                            "original": { "href": "/images/o1_avatar.jpg" },
+                            "small": { "href": "/images/o1_avatar_small.jpg" },
+                            "medium": { "href": "/images/o1_avatar_medium.jpg" },
+                            "large": { "href": "/images/o1_avatar_medium.jpg" },
+                        }
+                    },
+                    {
+                        "avatar_id": 2,
+                        "original_name" : "some_other_image.jpg",
+                        "created_by": 2,
+                        "_links": {
+                            "self": { "href": "/avatar/2" }
+                            "original": { "href": "/images/o2_avatar.jpg" },
+                            "small": { "href": "/images/o2_avatar_small.jpg" },
+                            "medium": { "href": "/images/o2_avatar_medium.jpg" },
+                            "large": { "href": "/images/o2_avatar_medium.jpg" },
+                        }
+                    }
+                ],
+                "_links": {
+                    "self": "/avatars"
+                }
+            }
+        
+### Create an avatar [POST]
+
+To create an avatar, a `multi-part/form-data` request is POSTed to this endpoint. 
+
++ Request (multipart/form-data; boundry=BOUNDARY)
+        
+        --BOUNDARY
+        Content-Disposition: form-data; name="image[file]"; filename="original_image.jpg"
+        Content-Type: image/jpeg
+        Content-Transfer-Encoding: base64
+        Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
+        /9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a
+        HBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIy
+        MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIA
+        AhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAf/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEB
+        AAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AL+AD//Z
+        --BOUNDARY--
+
++ Response 201 (application/json)
+    + Attributes (Avatar)
+        
+            
+            
+
+## Avatar [/avatars/{avatar_id}]
+
+### Get an avatar [GET]
+
+Retrieve a single avatar resource.
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+    + Attributes (Avatar)
+    
+
+### Delete an avatar [DELETE]
+
+When an avatar is deleted any companies, users or workspaces that are using the avatar will be unlinked from the avatar.
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 204
+
+
+## Avatar > Crop [/avatars/{avatar_id}/crop]
+
+### Crop an Avatar [PUT]
+
+Allows a user to crop an avatar, using the `top` and `left` properties to define the offest from the top-left corner of the image. The `width` and `height` properties define the size of the crop area.
+
++ Request (application/json)
+    + Attributes(Avatar Crop Request)
+    
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+    
++ Response 200 (application/json)
+    + Attributes (Avatar)
+ 
+
+# Group Address
+
+Addresses are stored in a independant top level resource. They are then linked to `companies` using the following endpoint:
+
+* **`PUT /companies/{company_id}/address`**
+
+## Address Collection [/address]
+
+### Create a new address [POST]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+    
+    + Body
+    
+            {
+                "line 1": "Heston House",
+                "line 2": "30 St Mary Axe",
+                "line 3": "",
+                "line 4": "",
+                "locality": "City of London",
+                "region": "Lodon",
+                "zipcode": "SE16 4BD",
+                "country": "United Kingdom",
+                "timezone": "London/Europe",
+            }
+            
++ Response 201 (application/json)
+
+        {
+            "address_id": 1,
+            "line 1": "Heston House",
+            "line 2": "30 St Mary Axe",
+            "line 3": "",
+            "line 4": "",
+            "locality": "City of London",
+            "region": "Lodon",
+            "zipcode": "SE16 4BD",
+            "country": "United Kingdom",
+            "timezone": "London/Europe",
+            "_links": {
+                "self": { "href": "/address/1"},
+                "hours":{ "href": "/address/1/hours"}
+            }
+        } 
+
+## Address [/address/{address_id}]
+
+### Get an address [GET]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+
+        {
+            "address_id": 1,
+            "line 1": "Heston House",
+            "line 2": "30 St Mary Axe",
+            "line 3": "",
+            "line 4": "",
+            "locality": "City of London",
+            "region": "Lodon",
+            "zipcode": "SE16 4BD",
+            "country": "United Kingdom",
+            "timezone": "London/Europe",
+            "_links": {
+                "self": { "href": "/address/1"},
+                "hours":{ "href": "/address/1/hours"}
+            }
+        }
+
+
+### Update an address [PUT]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+    
+    + Body
+    
+            {
+                "line 1": "Heston House",
+                "line 2": "30 St Mary Axe",
+                "line 3": "",
+                "line 4": "",
+                "locality": "City of London",
+                "region": "Lodon",
+                "zipcode": "SE16 4BD",
+                "country": "United Kingdom",
+                "timezone": "London/Europe",
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "address_id": 1,
+            "line 1": "Heston House",
+            "line 2": "30 St Mary Axe",
+            "line 3": "",
+            "line 4": "",
+            "locality": "City of London",
+            "region": "Lodon",
+            "zipcode": "SE16 4BD",
+            "country": "United Kingdom",
+            "timezone": "London/Europe",
+            "_links": {
+                "self": { "href": "/address/1"},
+                "hours":{ "href": "/address/1/hours"}
+            }
+        } 
+
+        
+### Delete an address [DELETE]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 204
+
+
+# Group Business Hours
+
+Business hours are linked with a specific address, hence they are available as a child resource of a valid address resource.
+
+## Address > Hours [/address/{address_id}/hours]
+
+### Get address hours [GET]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 200 (application/json)
+
+        {
+            "monday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "tuesday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "wednesday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "thursday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "friday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "saturday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "sunday":{
+                "open": "09:00",
+                "close": "16:00"
+            },
+            "_links:{
+                "self": { "href": "/address/1/hours" },
+                "parent": { "href": "/address/1" }
+            }
+        }
+
+### Set address hours [PUT]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+    
+            {
+                "monday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "tuesday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "wednesday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "thursday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "friday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "saturday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "sunday":{
+                    "open": "09:00",
+                    "close": "16:00"
+                }
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "monday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "tuesday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "wednesday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "thursday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "friday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "saturday":{
+                "open": "09:00",
+                "close": "17:00"
+            },
+            "sunday":{
+                "open": "09:00",
+                "close": "16:00"
+            },
+            "_links:{
+                "self": { "href": "/address/1/hours" },
+                "parent": { "href": "/address/1" }
+            }
+        }
+
+### Delete address hours [DELETE]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 204
+
+
+# Group Companies
+
+## Companies Collection [/companies]
+
+### List Companies [GET]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+        
++ Response 200 (application/json)
+
+        [
+            {
+                "company_id": 1,
+                "name": "Andrew's Widgets Ltd",
+                "created_time": "2015-05-01 00:00:00",
+                "total_licences": 10,
+                "owner_id": 1,
+                "active": true,
+                "avatar": {
+                    "avatar_id": 1,
+                    "original_name" : "some_image.jpg",
+                    "urls": {
+                        "original": "/images/o1_avatar.jpg",
+                        "small": "/images/o1_avatar_small.jpg",
+                        "medium": "/images/o1_avatar_medium.jpg",
+                        "large": "/images/o1_avatar_medium.jpg",
+                    },
+                    "created_by": 1
+                },
+                "address": {
+                    "line 1": "Heston House",
+                    "line 2": "30 St Mary Axe",
+                    "line 3": "",
+                    "line 4": "",
+                    "locality": "City of London",
+                    "region": "Lodon",
+                    "zipcode": "SE16 4BD",
+                    "country": "United Kingdom",
+                    "timezone": "London/Europe",
+                    "business_hours": {
+                        "monday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "tuesday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "wednesday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "thursday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "friday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "saturday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "sunday":{
+                            "open": "09:00",
+                            "close": "16:00"
+                        }
+                    }
+                }
+            },
+            {
+                "company_id": 2,
+                "name": "Leon's Laser Crop",
+                "created_time": "2015-05-01 00:00:00",
+                "total_licences": 20,
+                "owner_id": 5,
+                "active": true,
+                "avatar": {
+                    "avatar_id": 2,
+                    "original_name" : "some_image.jpg",
+                    "urls": {
+                        "original": "/images/o2_avatar.jpg",
+                        "small": "/images/o2_avatar_small.jpg",
+                        "medium": "/images/o2_avatar_medium.jpg",
+                        "large": "/images/o2_avatar_medium.jpg",
+                    },
+                    "created_by": 5
+                },
+                "address": {
+                    "line 1": "The Light House",
+                    "line 2": "15 Fowler Avenue",
+                    "line 3": "",
+                    "line 4": "",
+                    "locality": "Farnborough",
+                    "region": "Hampshire",
+                    "zipcode": "GU31 3FV",
+                    "country": "United Kingdom",
+                    "timezone": "London/Europe",
+                    "business_hours": {
+                        "monday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "tuesday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "wednesday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "thursday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "friday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "saturday":{
+                            "open": "09:00",
+                            "close": "17:00"
+                        },
+                        "sunday":{
+                            "open": "09:00",
+                            "close": "16:00"
+                        }
+                    }
+                },
+            }
+        ]
+
++ Response 403 (application/json)
+
+        {
+            "code": 403,
+            "error": "You do not have permissions to view this resource"
+        }
+
+
+### Create a new Company [POST]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+    
+    + Body
+            
+            {
+                "name": "Leon's Laser Corp",
+                "expiry_time": "2016-05-01 00:00:00",
+                "total_licences": 20,
+                "active": true,
+            }
+            
++ Response 201 (application/json)
+
+    + Headers
+        
+            Location: /users/3
+            
+    + Body
+    
+            {
+                "company_id": 2,
+                "name": "Leon's Laser Corp",
+                "created_time": "2015-05-01 00:00:00",
+                "expiry_time": "2016-05-01 00:00:00",
+                "total_licences": 20,
+                "owner_id": null,
+                "active": true,
+                }
+            } 
+
+## Company [/companies/{company_id}{?stub}]
+
+### Get a company [GET]
+
++ Parameters
+    + stub: `address` (enum[string], optional) 
+    
+        Specifying one or more stubs in the url will modify the response to include these child resources
+        
+        + Default: `none`        
+
+        + Members
+            + `address` - The address will be included in the response
+            + `avatar` - The avatar will be inclued in the response
+            + `none` - No additional stubs will be included in the response
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+        
++ Response 200 (application/json)
+
+        {
+            "company_id": 1,
+            "name": "Andrew's Widgets Ltd",
+            "created_time": "2015-05-01 00:00:00",
+            "total_licences": 10,
+            "owner_id": 1,
+            "active": true,
+            "avatar": {
+                "avatar_id": 1,
+                "original_name" : "some_image.jpg",
+                "urls": {
+                    "original": "/images/o1_avatar.jpg",
+                    "small": "/images/o1_avatar_small.jpg",
+                    "medium": "/images/o1_avatar_medium.jpg",
+                    "large": "/images/o1_avatar_medium.jpg",
+                },
+                "created_by": 1
+            },
+            "address": {
+                "address_id": 1,
+                "line 1": "Heston House",
+                "line 2": "30 St Mary Axe",
+                "line 3": "",
+                "line 4": "",
+                "locality": "City of London",
+                "region": "Lodon",
+                "zipcode": "SE16 4BD",
+                "country": "United Kingdom",
+                "timezone": "London/Europe",
+                "business_hours": {
+                    "monday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "tuesday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "wednesday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "thursday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "friday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "saturday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "sunday":{
+                        "open": "09:00",
+                        "close": "16:00"
+                    }
+                }
+            },
+            "_links": {
+                "self": { "href": "/companies/1" },
+                "avatar": { "href": "/companies/1/avatar" },
+                "address": { "href": "/companies/1/address" },
+            }
+        }
+        
+### Update a company [PUT]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+    
+    * Body
+            
+            {
+                "name": "Andrew's Widgets Plc",
+                "total_licences": 10,
+                "active": true,
+                "owner_id": 1
+            }
+
++ Response 200 (application/json)
+
+        {
+            "company_id": 1,
+            "name": "Andrew's Widgets Plc",
+            "created_time": "2015-05-01 00:00:00",
+            "total_licences": 10,
+            "owner_id": 1,
+            "active": true,
+            "avatar": {
+                "url": "/images/c1_avatar.jpg",
+                "filename": "original_image.jpg"
+            },
+            "address": {
+                "line 1": "Heston House",
+                "line 2": "30 St Mary Axe",
+                "line 3": "",
+                "line 4": "",
+                "locality": "City of London",
+                "region": "Lodon",
+                "zipcode": "SE16 4BD",
+                "country": "United Kingdom",
+                "timezone": "London/Europe",
+                "business_hours": {
+                    "monday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "tuesday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "wednesday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "thursday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "friday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "saturday":{
+                        "open": "09:00",
+                        "close": "17:00"
+                    },
+                    "sunday":{
+                        "open": "09:00",
+                        "close": "16:00"
+                    }
+                }
+            },
+            "_links": {
+                "self": { "href": "/companies/1" },
+                "avatar": { "href": "/companies/1/avatar" },
+                "address": { "href": "/companies/1/address" },
+            }
+        }   
+        
+### Delete a company [DELETE]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 204
+
+
+# Group Company > Address
+
+## Company > Address [/companies/{company_id}/address]
+
+### Select a company address [POST]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+    
+            {
+                "address_id": 2
+            }
+
++ Response 200 (application/json)
+        
+        {
+            "line 1": "Heston House",
+            "line 2": "30 St Mary Axe",
+            "line 3": "",
+            "line 4": "",
+            "locality": "City of London",
+            "region": "Lodon",
+            "zipcode": "SE16 4BD",
+            "country": "United Kingdom",
+            "timezone": "London/Europe",
+            "business_hours": {
+                "monday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "tuesday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "wednesday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "thursday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "friday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "saturday":{
+                    "open": "09:00",
+                    "close": "17:00"
+                },
+                "sunday":{
+                    "open": "09:00",
+                    "close": "16:00"
+                }
+        }     
+
++ Response 404 (application/json)
+
+        {
+            "error": "address not found"
+        }
+        
++ Response 403 (application/json)
+
+        {
+            "error": "you do not have permission to assign the requested address to this company"
+        }
+
+
+
+# Group Company > Avatar
+
+## Company > Avatar [/companies/{company_id}/avatar]
+
+### Select a company avatar [POST]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+    
+            {
+                "avatar_id": 1
+            }
+
++ Response 200 (application/json)
+
+        {
+            "avatar_id": 1,
+            "original_name" : "some_image.jpg",
+            "urls": {
+                "original": "/images/o1_avatar.jpg",
+                "small": "/images/o1_avatar_small.jpg",
+                "medium": "/images/o1_avatar_medium.jpg",
+                "large": "/images/o1_avatar_medium.jpg",
+            },
+            "created_by": 1
+            "_links": {
+                "self": "/avatar/1"
+            }
+        }
+    
++ Response 404
+
+        {
+            "error": "Avatar not found"
+        }
+     
+        
+### Deselect a company avatar [DELETE]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 204
+
+
+# Group Company > Workspace
+
+## Company > Workspace [/companies/{company_id}/workspace{?stub}]
+
+### Get a list of company workspace [GET]
+
++ Parameters
+    + stub: `avatar` (enum[string], optional) 
+    
+        Specifying one or more stubs in the url will modify the response to include these child resources
+        
+        + Default: `none`        
+
+        + Members
+            + `avatar` - The avatar will be inclued in the response
+            + `none` - No additional stubs will be included in the response
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+
+        [
+            {
+                "workspace_id": 1,
+                "name": "UK Workspace",
+                "description": "This is a workspace for our UK based accounts and streams",
+                "avatar": {
+                    "avatar_id": 5,
+                    "original_name" : "some_workspace_image.jpg",
+                    "urls": {
+                        "original": "/images/o1_avatar.jpg",
+                        "small": "/images/o1_avatar_small.jpg",
+                        "medium": "/images/o1_avatar_medium.jpg",
+                        "large": "/images/o1_avatar_medium.jpg",
+                    },
+                    "created_by": 1
+                    "_links": {
+                        "self": "/avatar/5"
+                    }
+                },
+                "_links": {
+                    "self": "/workspace/1",
+                    "avatar": "/workspace/1/avatar",
+                    "user_access": "/workspace/1/user_access"
+                }
+            },
+            {
+                "workspace_id": 2,
+                "name": "US Workspace",
+                "description": "This is a workspace for our US based accounts and streams",
+                "avatar": {
+                    "avatar_id": 7,
+                    "original_name" : "some_workspace_image2.jpg",
+                    "urls": {
+                        "original": "/images/o2_avatar.jpg",
+                        "small": "/images/o2_avatar_small.jpg",
+                        "medium": "/images/o2_avatar_medium.jpg",
+                        "large": "/images/o2_avatar_medium.jpg",
+                    },
+                    "created_by": 1
+                    "_links": {
+                        "self": "/avatar/7"
+                    }
+                },
+                "_links": {
+                    "self": "/workspace/1",
+                    "avatar": "/workspace/1/avatar",
+                    "user_access": "/workspace/1/user_access"
+                }
+            }
+        ]
+
+
+# Group Partners
+
+TODO
+
+# Group Users
+
+## Users Collection [/users]
+
+### List Users [GET]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+        
++ Response 200 (application/json)
+
+        [
+            {
+                "email": "foo@bar.com",
+                "forename": "Foo",
+                "surname": "Bar",
+                "system_admin": true,
+                "url": "/users/1,
+                "avatar": {
+                    "url": "/images/u1_avatar.jpg",
+                    "filename": "foo_image.jpg"
+                },
+                "workspaces": [
+                    {
+                        "name": "Workspace 1",
+                        "avatar": "images/w1_avatar.jpg",
+                        "url": "workspaces/1",
+                        "enabled": true
+                    },
+                    {
+                        "name": "Workspace 2",
+                        "avatar": "images/w2_avatar.jpg",
+                        "url": "workspaces/2",
+                        "enabled": true
+                    }
+                ]
+            },
+            {
+                "email": "fruit@cake.com",
+                "forename": "Fruit",
+                "surname": "Cake",
+                "system_admin": false,
+                "url": "/users/2,
+                "avatar": {
+                    "url": "/images/u2_avatar.jpg",
+                    "filename": "fruit_image.jpg"
+                },
+                "workspaces": [
+                    {
+                        "name": "Workspace 1",
+                        "avatar": "images/w1_avatar.jpg",
+                        "url": "workspaces/1",
+                        "enabled": true
+                    },
+                    {
+                        "name": "Workspace 2",
+                        "avatar": "images/w2_avatar.jpg",
+                        "url": "workspaces/2",
+                        "enabled": false
+                    }
+                ]
+            }
+        ]
+
++ Response 403 (application/json)
+
+        {
+            "error": "You do not have permissions to view this resource"
+        }
+        
++ Response 404 (application/json)
+
+        {
+            "error": "You do not have permissions to view this resource"
+        }
+
+### Create a new User [POST]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+    
+    + Body
+            
+            {
+                "email": "john@doe.com",
+                "password": "j0hnD03
+                "forename": "Fruit",
+                "surname": "Cake",
+                "system_admin": false,
+            }
+            
++ Response 201 (application/json)
+
+    + Headers
+        
+            Location: /users/3
+            
+    + Body
+    
+            {
+                "email": "john@doe.com",
+                "forename": "John",
+                "surname": "Doe",
+                "system_admin": false,
+                "url": "/users/3,
+                "avatar": {
+                    "url": "/images/u1_avatar.jpg",
+                    "filename": "john_image.jpg"
+                },
+                "workspaces": [
+                    {
+                        "name": "Workspace 1",
+                        "avatar": "images/w1_avatar.jpg",
+                        "url": "workspaces/1",
+                        "enabled": false
+                    },
+                    {
+                        "name": "Workspace 2",
+                        "avatar": "images/w2_avatar.jpg",
+                        "url": "workspaces/2",
+                        "enabled": false
+                    }
+                ]
+            } 
+            
+## User [/users/{user_id}{?stub}]
+
++ Parameters
+
+    + user_id (number) - ID of the user in the form of an Integer
+    
+### Get a user [GET] 
+
++ Parameters
+    + stub: `workspace` (enum[string], optional) 
+    
+        Specifying one or more stubs in the url will modify the response to include these child resources
+        
+        + Default: `none`        
+
+        + Members
+            + `workspace` - The address will be included in the response
+            + `none` - No additional stubs will be included in the response
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+    
++ Response 200 (application/json)
+
+        {
+            "user_id": 1,
+            "email": "foo@bar.com",
+            "forename": "Foo",
+            "surname": "Bar",
+            "system_admin": true,
+            "url": "/users/1,
+            "avatar": "/images/u1_avatar.jpg",
+            "workspaces": [
+                {
+                    "name": "Workspace 1",
+                    "avatar": "images/w1_avatar.jpg",
+                    "url": "workspaces/1",
+                    "enabled": true
+                },
+                {
+                    "name": "Workspace 2",
+                    "avatar": "images/w2_avatar.jpg",
+                    "url": "workspaces/2",
+                    "enabled": true
+                }
+            ],
+            "_links": {
+                "self": { "href": "/users/1" },
+                "company": { "href": "/companies/1" },
+                "workspace": { "href": "/users/1/workspace" }
+            }
+        }
+        
+### Update a user [PUT]
+    
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+    
+    * Body
+            
+            {
+                "email": "fruit@cake.com",
+                "password": "Fru1tY"
+                "forename": "Cherry",
+                "surname": "Pie",
+                "system_admin": true,
+            }
+
++ Response 200 (application/json)
+
+        {
+            "user_id": 1,
+            "email": "fruit@cake.com",
+            "forename": "Cherry",
+            "surname": "Pie",
+            "system_admin": true,
+            "url": "/users/1,
+            "avatar": "/images/u1_avatar.jpg",
+            "workspace": [
+                {
+                    "workspace_id": 1,
+                    "name": "UK Workspace",
+                    "description": "This is a workspace for our UK based accounts and streams",
+                    "avatar": {
+                        "avatar_id": 5,
+                        "original_name" : "some_workspace_image.jpg",
+                        "urls": {
+                            "original": "/images/o1_avatar.jpg",
+                            "small": "/images/o1_avatar_small.jpg",
+                            "medium": "/images/o1_avatar_medium.jpg",
+                            "large": "/images/o1_avatar_medium.jpg",
+                        },
+                        "created_by": 1
+                        "_links": {
+                            "self": { "href": "/avatar/5" }
+                        }
+                    },
+                    "_links": {
+                        "self": { "href": "/workspace/1" },
+                        "avatar": { "href": "/workspace/1/avatar" },
+                        "user_access": { "href": "/workspace/1/user_access" }
+                    }
+                }
+            ],
+            "_links": {
+                "self": { "href": "/users/1" },
+                "workspace": { "href": "/users/1/workspace" },
+                "company": { "href": "/company/1/workspace" }
+            }
+        }
+        
+### Delete a user [DELETE]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 204
+
+
+# Group User > Avatar
+
+## User > Avatar [/users/{user_id}/avatar]
+
+### Select a user avatar [PUT]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+    
+            {
+                "avatar_id": 1
+            }
+
++ Response 200 (application/json)
+
+        {
+            "avatar_id": 1,
+            "original_name" : "some_image.jpg",
+            "urls": {
+                "original": "/images/o1_avatar.jpg",
+                "small": "/images/o1_avatar_small.jpg",
+                "medium": "/images/o1_avatar_medium.jpg",
+                "large": "/images/o1_avatar_medium.jpg",
+            },
+            "created_by": 1
+            "_links": {
+                "self": "/avatar/1"
+            }
+        }
+    
++ Response 404
+
+        {
+            "error": "Avatar not found"
+        }
+        
+### Deselect a user avatar [DELETE]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 204
+
+
+# Group User > Workspace
+
+## User > Workspace Collection [/users/{user_id}/workspace{?stub}]
+
+### Get a list of user workspace [GET]
+
++ Parameters
+    + stub: `avatar` (enum[string], optional) 
+    
+        Specifying one or more stubs in the url will modify the response to include these child resources
+        
+        + Default: `none`        
+
+        + Members
+            + `avatar` - The avatar will be inclued in the response
+            + `none` - No additional stubs will be included in the response
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+
+        [
+            {
+                "workspace_id": 1,
+                "name": "UK Workspace",
+                "description": "This is a workspace for our UK based accounts and streams",
+                "avatar": {
+                    "avatar_id": 5,
+                    "original_name" : "some_workspace_image.jpg",
+                    "urls": {
+                        "original": "/images/o1_avatar.jpg",
+                        "small": "/images/o1_avatar_small.jpg",
+                        "medium": "/images/o1_avatar_medium.jpg",
+                        "large": "/images/o1_avatar_medium.jpg",
+                    },
+                    "created_by": 1
+                    "_links": {
+                        "self": "/avatar/5"
+                    }
+                },
+                "_links": {
+                    "self": "/workspace/1",
+                    "avatar": "/workspace/1/avatar",
+                    "user_access": "/workspace/1/user_access"
+                }
+            },
+            {
+                "workspace_id": 2,
+                "name": "US Workspace",
+                "description": "This is a workspace for our US based accounts and streams",
+                "avatar": {
+                    "avatar_id": 7,
+                    "original_name" : "some_workspace_image2.jpg",
+                    "urls": {
+                        "original": "/images/o2_avatar.jpg",
+                        "small": "/images/o2_avatar_small.jpg",
+                        "medium": "/images/o2_avatar_medium.jpg",
+                        "large": "/images/o2_avatar_medium.jpg",
+                    },
+                    "created_by": 1
+                    "_links": {
+                        "self": "/avatar/7"
+                    }
+                },
+                "_links": {
+                    "self": "/workspace/1",
+                    "avatar": "/workspace/1/avatar",
+                    "user_access": "/workspace/1/user_access"
+                }
+            }
+        ]
+
+
+# Group Workspace
+
+## Workspace Collection [/workspace]
+
+### Create a new workspace [POST]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+            
+            {
+                "name": "UK Workspace",
+                "description": "This is a workspace for our US based accounts and streams"
+            }
+            
++ Response 200 (application/json)
+
+        {
+                "workspace_id": 1,
+                "name": "UK Workspace",
+                "description": "This is a workspace for our UK based accounts and streams",
+                "_links": {
+                    "self": { "href": "/workspace/1" },
+                    "avatar": { "href": "/workspace/1/avatar" },
+                    "user_access": { "href": "/workspace/1/user_access" },
+                    "company": { "href": "/company/1" }
+                }
+            }
+            
+## Workspace [/workspace/{workspace_id}]
+
+### Delete a workspace [DELETE]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 204
+
+
+# Group Workspace > Access
+
+## Workspace > Access Collection [/workspace/{workspace_id}/access]
+
+### List all users with access [GET]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+
+        "access_list": [
+            {
+                "access_id": 1
+                "user_id": 1,
+                "role_id": 10,
+                "_links": {
+                    "self": { "href": "/workspace/{workspace_id}/access/1" },
+                    "user": { "href": "/users/1" },
+                    "role": { "href": "/workspace/{workspace_id}/roles/10" }
+                }
+            },
+            {
+                "access_id": 2
+                "user_id": 2,
+                "role_id": 10,
+                "_links": {
+                    "self": { "href": "/workspace/{workspace_id}/access/2" },
+                    "user": { "href": "/users/2" },
+                    "role": { "href": "/workspace/{workspace_id}/roles/10" }
+                }
+            }
+        ],
+        "_links" {
+            "self": { "href": "/workspace/{workspace_id}/access" },
+        }
+
+### Grant access to a user [POST]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+    
+            {
+                "user_id": 3,
+                "role_id": 10,
+            }
+
++ Response 201 (application/json)
+
+        {
+            "access_id": 11
+            "user_id": 3,
+            "role_id": 12,
+            "_links": {
+                "self": { "href": "/workspace/{workspace_id}/access/11" },
+                "user": { "href": "/users/3" },
+                "role": { "href": "/workspace/{workspace_id}/roles/12" }
+            }
+        }
+
+
+## Workspace > Access [/workspace/{workspace_id}/access/{access_id}]
+
+### Get an access record [GET]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 200 (application/json)
+
+        {
+            "access_id": 11
+            "user_id": 3,
+            "role_id": 12,
+            "_links": {
+                "self": { "href": "/workspace/{workspace_id}/access/11" },
+                "user": { "href": "/users/3" },
+                "role": { "href": "/workspace/{workspace_id}/roles/12" }
+            }
+        }
+
+### Update an access record [PUT]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+    
+            {
+                "user_id": 3,
+                "role_id": 13,
+            }
+
++ Response 200 (application/json)
+
+        {
+            "access_id": 11
+            "user_id": 3,
+            "role_id": 13,
+            "_links": {
+                "self": { "href": "/workspace/{workspace_id}/access/11" },
+                "user": { "href": "/users/3" },
+                "role": { "href": "/workspace/{workspace_id}/roles/13" }
+            }
+        }
+
+### Revoke access for a user [DELETE]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 204
+
+
+# Group Workspace > Roles
+
+## Workspace > Roles Collection [/workspace/{workspace_id}/roles{?stub}]
+
+### List all roles [GET]
+
++ Parameters
+    + stub: `page_access` (enum[string], optional) 
+    
+        Specifying one or more stubs in the url will modify the response to include these child resources
+        
+        + Default: `none`        
+
+        + Members
+            + `page_access` - The page access settings for the role
+            + `social_access` - The spocial accounts access settings for the role
+            + `keyword_access` - The keyword streams access settings for the role
+            + `none` - No stubs will be displayed
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 200 (application/json)
+
+        [
+            {
+                "role_id": 1,
+                "name": "Administrator",
+                "page_access": {
+                    "inbox": true,
+                    "metrics": true,
+                    "publish": true,
+                    "settings": true
+                },
+                "social_access": [
+                    {
+                        "stream_id": 1,
+                        "type": "facebook",
+                        "name": "Sentiment Facebook",
+                        "pages": {
+                            "inbox": true,
+                            "publish": true,
+                            "metrics": true,
+                        }
+                    },
+                    {
+                        "stream_id": 2,
+                        "type": "twitter",
+                        "name": "Sentiment Twitter",
+                        "pages": {
+                            "inbox": true,
+                            "publish": true,
+                            "metrics": true,
+                        }
+                    },
+                ],
+                "keyword_access":[
+                    {
+                        "stream_id: 3,
+                        "type": "keyword",
+                        "name": "Sentiment Social CS",
+                        "search_term": "'Sentiment Metrics' AND 'Social Customer Service'", 
+                        "pages": {
+                            "inbox": true,
+                            "metrics": true,
+                        }
+                    },   
+                ],
+                "_links": {
+                    "self" : "/workspace/1/roles/1"
+                }
+            },
+            {
+                "role_id": 2,
+                "name": "Facebook CS",
+                "page_access": {
+                    "inbox": true,
+                    "metrics": false,
+                    "publish": false,
+                    "settings": false
+                },
+                "social_access": [
+                    {
+                        "stream_id": 1,
+                        "type": "facebook",
+                        "name": "Sentiment Facebook",
+                        "pages": {
+                            "inbox": true,
+                            "publish": false,
+                            "metrics": false,
+                        }
+                    },
+                    {
+                        "stream_id": 2,
+                        "type": "twitter",
+                        "name": "Sentiment Twitter",
+                        "pages": {
+                            "inbox": false,
+                            "publish": false,
+                            "metrics": false,
+                        }
+                    },
+                ],
+                "keyword_access":[
+                    {
+                        "stream_id: 3,
+                        "type": "keyword",
+                        "name": "Sentiment Social CS",
+                        "search_term": "'Sentiment Metrics' AND 'Social Customer Service'", 
+                        "pages": {
+                            "inbox": false,
+                            "metrics": false,
+                        }
+                    },   
+                ],
+                "_links": {
+                    "self" : "/workspace/1/roles/2"
+                }
+            }
+        ]
+        
+### Create a new role [POST]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+    
+            {
+                "name": "Twitter CS",
+                "page_access": {
+                    "inbox": true,
+                    "metrics": false,
+                    "publish": false,
+                    "settings": false
+                },
+                "social_access": [
+                    {
+                        "stream_id": 1,
+                        "pages": {
+                            "inbox": false,
+                            "publish": false,
+                            "metrics": false,
+                        }
+                    },
+                    {
+                        "stream_id": 2,
+                        "pages": {
+                            "inbox": true,
+                            "publish": false,
+                            "metrics": false,
+                        }
+                    },
+                ],
+                "keyword_access":[
+                    {
+                        "stream_id: 3,
+                        "pages": {
+                            "inbox": false,
+                            "metrics": false,
+                        }
+                    },   
+                ],
+                "_links": {
+                    "self" : "/workspace/1/roles/2"
+                }
+            }    
+            
++ Response 201 (application/json)
+
+            {
+                "role_id": 3,
+                "name": "Twitter CS",
+                "page_access": {
+                    "inbox": true,
+                    "metrics": false,
+                    "publish": false,
+                    "settings": false
+                },
+                "social_access": [
+                    {
+                        "stream_id": 1,
+                        "type": "facebook",
+                        "name": "Sentiment Facebook",
+                        "pages": {
+                            "inbox": false,
+                            "publish": false,
+                            "metrics": false,
+                        }
+                    },
+                    {
+                        "stream_id": 2,
+                        "type": "twitter",
+                        "name": "Sentiment Twitter",
+                        "pages": {
+                            "inbox": true,
+                            "publish": false,
+                            "metrics": false,
+                        }
+                    },
+                ],
+                "keyword_access":[
+                    {
+                        "stream_id: 3,
+                        "type": "keyword",
+                        "name": "Sentiment Social CS",
+                        "search_term": "'Sentiment Metrics' AND 'Social Customer Service'", 
+                        "pages": {
+                            "inbox": false,
+                            "metrics": false,
+                        }
+                    },   
+                ],
+                "_links": {
+                    "self" : "/workspace/1/roles/3"
+                }
+            }
+
+
+## Workspace > Roles [/workspace/{workspace_id}/roles/{role_id}{?stub}]
+    
+### Get a role [GET]
+
++ Parameters
+    + stub: `page_access` (enum[string], optional) 
+    
+        Specifying one or more stubs in the url will modify the response to include these child resources
+        
+        + Default: `none`        
+
+        + Members
+            + `page_access` - The page access settings for the role
+            + `social_access` - The spocial accounts access settings for the role
+            + `keyword_access` - The keyword streams access settings for the role
+            + `none` - No stubs will be displayed
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 200 (application/json)
+
+        {
+            "role_id": 3,
+            "name": "Twitter CS",
+            "page_access": {
+                "inbox": true,
+                "metrics": false,
+                "publish": false,
+                "settings": false
+            },
+            "social_access": [
+                {
+                    "stream_id": 1,
+                    "type": "facebook",
+                    "name": "Sentiment Facebook",
+                    "pages": {
+                        "inbox": false,
+                        "publish": false,
+                        "metrics": false,
+                    }
+                },
+                {
+                    "stream_id": 2,
+                    "type": "twitter",
+                    "name": "Sentiment Twitter",
+                    "pages": {
+                        "inbox": true,
+                        "publish": false,
+                        "metrics": false,
+                    }
+                },
+            ],
+            "keyword_access":[
+                {
+                    "stream_id: 3,
+                    "type": "keyword",
+                    "name": "Sentiment Social CS",
+                    "search_term": "'Sentiment Metrics' AND 'Social Customer Service'", 
+                    "pages": {
+                        "inbox": false,
+                        "metrics": false,
+                    }
+                },   
+            ],
+            "_links": {
+                "self" : "/workspace/1/roles/3"
+            }
+        }
+        
+
+### Update a role [PUT]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+        
+    + Body
+    
+            {
+                "name": "Twitter CS",
+                "page_access": {
+                    "inbox": true,
+                    "metrics": false,
+                    "publish": true,
+                    "settings": false
+                },
+                "social_access": [
+                    {
+                        "stream_id": 1,
+                        "type": "facebook",
+                        "name": "Sentiment Facebook",
+                        "pages": {
+                            "inbox": false,
+                            "publish": false,
+                            "metrics": false,
+                        }
+                    },
+                    {
+                        "stream_id": 2,
+                        "type": "twitter",
+                        "name": "Sentiment Twitter",
+                        "pages": {
+                            "inbox": true,
+                            "publish": true,
+                            "metrics": false,
+                        }
+                    },
+                ],
+                "keyword_access":[
+                    {
+                        "stream_id: 3,
+                        "type": "keyword",
+                        "name": "Sentiment Social CS",
+                        "search_term": "'Sentiment Metrics' AND 'Social Customer Service'", 
+                        "pages": {
+                            "inbox": false,
+                            "metrics": false,
+                        }
+                    },   
+                ]
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "role_id": 3,
+            "name": "Twitter CS",
+            "page_access": {
+                "inbox": true,
+                "metrics": false,
+                "publish": false,
+                "settings": false
+            },
+            "social_access": [
+                {
+                    "stream_id": 1,
+                    "type": "facebook",
+                    "name": "Sentiment Facebook",
+                    "pages": {
+                        "inbox": false,
+                        "publish": false,
+                        "metrics": false,
+                    }
+                },
+                {
+                    "stream_id": 2,
+                    "type": "twitter",
+                    "name": "Sentiment Twitter",
+                    "pages": {
+                        "inbox": true,
+                        "publish": false,
+                        "metrics": false,
+                    }
+                },
+            ],
+            "keyword_access":[
+                {
+                    "stream_id: 3,
+                    "type": "keyword",
+                    "name": "Sentiment Social CS",
+                    "search_term": "'Sentiment Metrics' AND 'Social Customer Service'", 
+                    "pages": {
+                        "inbox": false,
+                        "metrics": false,
+                    }
+                },   
+            ],
+            "_links": {
+                "self" : "/workspace/1/roles/3"
+            }
+        }
+            
+
+### Delete a role [DELETE]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 204
+
+# Group Workspace > Streams
+
+## Streams Collection [/workspace/{workspace_id}/streams{?type}]
+
+### List streams [GET]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 200 (application/json)
+
+        {
+            "streams": [
+                {
+                    "stream_id": 1,
+                    "name": "Sentiment Facebook",
+                    "created_on": "2015-10-22 11:03:00",
+                    "created_by": 1,
+                    "stream_type": {
+                        "stream_type_id": 1,
+                        "name": "Facebook",
+                        "_links": {
+                            "self": "/stream_types/1"
+                        }
+                    },
+                    "social_account": {
+                        "social_account_id": 1,
+                        "name": "Sentiment Main Facebook",
+                        "_links": {
+                            "self": { "href": "/workspace/1/social_accounts/1" }
+                        }
+                    },
+                    "_links": {
+                        "self": { "href": "/workspace/1/streams/1" }
+                    }
+                },
+                {
+                    "stream_id": 2,
+                    "name": "Sentiment Twitter",
+                    "created_on": "2015-10-22 11:08:00",
+                    "created_by": 1,
+                    "stream_type": {
+                        "stream_type_id": 2,
+                        "name": "Facebook",
+                        "_links": {
+                            "self": { "href": "/stream_types/2" }
+                        }
+                    },
+                    "social_account": {
+                        "social_account_id": 2,
+                        "name": "Sentiment Main Twitter",
+                        "_links": {
+                            "self":  { "href": "/workspace/1/social_accounts/2" }
+                        }
+                    },
+                    "_links": {
+                        "self": { "href": "/workspace/1/streams/2" }
+                    }
+                },
+                {
+                    "stream_id": 3,
+                    "name": "Sentiment Social CS",
+                    "created_on": "2015-10-22 11:03:00",
+                    "created_by": 1,
+                    "stream_type": {
+                        "stream_type_id": 3,
+                        "name": "Keyword",
+                        "_links": {
+                            "self": { "href": "/stream_types/3" }
+                        }
+                    },
+                    "keyword_term": "'Sentiment Metrics' AND 'Social Customer Service'",
+                    "_links": {
+                        "self": { "href": "/workspace/1/streams/3" }
+                    }
+                    }
+                }
+            ],
+            "_links": {
+                
+            }
+        
+
+### Create a stream [POST]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+    
+    + Body
+    
+            {
+                "name": "Sentiment Facebook",
+                "stream_type": {
+                    "stream_type_id": 1,
+                },
+                "social_account": {
+                    "social_account_id": 1,
+                },
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "stream_id": 1,
+            "name": "Sentiment Facebook",
+            "created_on": "2015-10-22 11:03:00",
+            "created_by": 1,
+            "stream_type": {
+                "stream_type_id": 1,
+                "name": "Facebook",
+                "_links": {
+                    "self": "/stream_types/1"
+                }
+            },
+            "social_account": {
+                "social_account_id": 1,
+                "name": "Sentiment Main Facebook",
+                "_links": {
+                    "self": { "href": "/workspace/1/social_accounts/1" }
+                }
+            },
+            "_links": {
+                "self": { "href": "/workspace/1/streams/1" }
+            }
+        }
+
+
+## Stream [/workspace/{workspace_id}/streams/{stream_id}]
+
+### Get a stream [GET]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
+            
++ Response 200 (application/json)
+
+        {
+            "stream_id": 1,
+            "name": "Sentiment Facebook",
+            "created_on": "2015-10-22 11:03:00",
+            "created_by": 1,
+            "stream_type": {
+                "stream_type_id": 1,
+                "name": "Facebook",
+                "_links": {
+                    "self": "/stream_types/1"
+                }
+            },
+            "social_account": {
+                "social_account_id": 1,
+                "name": "Sentiment Main Facebook",
+                "_links": {
+                    "self": { "href": "/workspace/1/social_accounts/1" }
+                }
+            },
+            "_links": {
+                "self": { "href": "/workspace/1/streams/1" }
+            }
+        }
+
+### Update a stream [PUT]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+    
+    + Body
+    
+            {
+                "name": "Sentiment Facebook",
+                "stream_type": {
+                    "stream_type_id": 1,
+                },
+                "social_account": {
+                    "social_account_id": 9,
+                },
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "stream_id": 1,
+            "name": "Sentiment Facebook",
+            "created_on": "2015-10-22 11:03:00",
+            "created_by": 1,
+            "stream_type": {
+                "stream_type_id": 1,
+                "name": "Facebook",
+                "_links": {
+                    "self": "/stream_types/1"
+                }
+            },
+            "social_account": {
+                "social_account_id": 9,
+                "name": "Sentiment Other Facebook",
+                "_links": {
+                    "self": { "href": "/workspace/1/social_accounts/9" }
+                }
+            },
+            "_links": {
+                "self": { "href": "/workspace/1/streams/1" }
+            }
+        }
+
+### Delete a stream [DELETE]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 204
+
+
+# Group Workspace > Social Accounts
+
+## Social Account Collection [/workspace/{workspace_id}/social_accounts]
+
+### List all social accounts [GET]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+    
++ Response 200 (application_json)
+
+        {
+            "social_accounts: [
+                {
+                    "social_account_id": 1,
+                    "name": "@SentimentUK",
+                    "label": "Sentiment Twitter UK",
+                    "type": {
+                        "social_account_type_id": 1,
+                        "name": "twitter",
+                        "_links": {
+                            "self": { "href": "/social_account_types/1" }
+                        }
+                    },
+                    "created_by": 1,
+                    "oauth_token": "2345388249-zdKbG5ZAR2Sv9CIBiMDXGRfcKqoaumnHHq36Izo",
+                    "oauth_token_secret": "uWO2lapIdc3KakXcMCZvUSrvgsg4AL4uC1h5plKVWAHAY",
+                    "_links": {
+                        "self": { "href": "/workspace/1/social_accounts/1" }
+                    }
+                },
+                {
+                    "social_account_id": 2,
+                    "name": "Sentiment Facebook",
+                    "label": "Sentiment Facebook",
+                    "type": {
+                        "social_account_type_id": 2,
+                        "name": "facebook",
+                        "_links": {
+                            "self": { "href": "/social_account_types/2" }
+                        }
+                    },
+                    "created_by": 1,
+                    "oauth_token": "2345388249-zdKbG5ZAR2Sv9CIBiMDXGRfcKqoaumnHHq36Izo",
+                    "_links": {
+                        "self": { "href": "/workspace/1/social_accounts/2" }
+                    }
+                }
+            ],
+            "links": {
+                "self": { "href": "/workspace/1/social_accounts" }
+            }
+        }
+
+### Create a social account [POST]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+            
+            {
+                "name": "@SentimentUK",
+                "label": "Sentiment Twitter UK",
+                "type": {
+                    "social_account_type_id": 1,
+                },
+                "created_by": 1,
+                "oauth_token": "2345388249-zdKbG5ZAR2Sv9CIBiMDXGRfcKqoaumnHHq36Izo",
+                "oauth_token_secret": "uWO2lapIdc3KakXcMCZvUSrvgsg4AL4uC1h5plKVWAHAY"
+            }
+    
++ Response 201 (application_json)
+
+        {
+            "social_account_id": 1,
+            "name": "@SentimentUK",
+            "label": "Sentiment Twitter UK",
+            "type": {
+                "social_account_type_id": 1,
+                "name": twitter,
+                "_links": {
+                    "self": { "href": "/social_account_types/1" }
+                }
+            },
+            "created_by": 1,
+            "oauth_token": "2345388249-zdKbG5ZAR2Sv9CIBiMDXGRfcKqoaumnHHq36Izo",
+            "oauth_token_secret": "uWO2lapIdc3KakXcMCZvUSrvgsg4AL4uC1h5plKVWAHAY",
+            "_links": {
+                "self": "/workspace/1/social_accounts/1"
+            }
+        }
+
+## Social Account [/workspace/{workspace_id}/social_accounts/{social_account_id}]
+
+### Get a social account [GET]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 200 (application/json)
+
+        {
+            "social_account_id": 1,
+            "name": "@SentimentUK",
+            "label": "Sentiment Twitter UK",
+            "type": {
+                "social_account_type_id": 1,
+                "name": twitter,
+                "_links": {
+                    "self": { "href": "/social_account_types/1" }
+                }
+            },
+            "created_by": 1,
+            "oauth_token": "2345388249-zdKbG5ZAR2Sv9CIBiMDXGRfcKqoaumnHHq36Izo",
+            "oauth_token_secret": "uWO2lapIdc3KakXcMCZvUSrvgsg4AL4uC1h5plKVWAHAY",
+            "_links": {
+                "self": "/workspace/1/social_accounts/1"
+            }
+        }
+
+### Update a social account [PUT]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+            
+            {
+                "name": "@SentimentUK",
+                "label": "Sentiment Twitter UK",
+                "type": {
+                    "social_account_type_id": 1,
+                },
+                "created_by": 1,
+                "oauth_token": "2345388249-zdKbG5ZAR2Sv9CIBiMDXGRfcKqoaumnHHq36Izo",
+                "oauth_token_secret": "uWO2lapIdc3KakXcMCZvUSrvgsg4AL4uC1h5plKVWAHAY"
+            }
+    
++ Response 200 (application_json)
+
+        {
+            "social_account_id": 1,
+            "name": "@SentimentUK",
+            "label": "Sentiment Twitter UK",
+            "type": {
+                "social_account_type_id": 1,
+                "name": twitter,
+                "_links": {
+                    "self": { "href": "/social_account_types/1" }
+                }
+            },
+            "created_by": 1,
+            "oauth_token": "2345388249-zdKbG5ZAR2Sv9CIBiMDXGRfcKqoaumnHHq36Izo",
+            "oauth_token_secret": "uWO2lapIdc3KakXcMCZvUSrvgsg4AL4uC1h5plKVWAHAY",
+            "_links": {
+                "self": "/workspace/1/social_accounts/1"
+            }
+        }
+
+### Delete a social account [DELETE]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 204
+
+# Group Workspace > Tags
+
+## Tags Collection [/workspace/{workspace_id}/tags]
+
+### List tags [GET]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+
+        {
+            "tags" : [
+                {
+                    "tag_id": 1,
+                    "name": "Marketing Posts",
+                    "is_folder": false,
+                    "parent_tag_id": 1,
+                    "created_by": 1,
+                    "inbox": true,
+                    "metrics": true,
+                    "publish": true
+                    "links": {
+                        "self": { "href": "/workspace/1/tags/1" }
+                    }
+                },
+                {
+                    "tag_id": 2,
+                    "name": "Customer Service",
+                    "is_folder": false,
+                    "parent_tag_id": 2,
+                    "created_by": 1,
+                    "inbox": true,
+                    "metrics": true,
+                    "publish": true
+                    "links": {
+                        "self": { "href": "/workspace/1/tags/2" }
+                    }
+                }
+            ],
+            "_links": {
+                "self": { "href": "/workspace/1/tags" }
+            }
+
+### Create a tag [POST]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+    
+            {
+                "name": "Marketing Spam",
+                "is_folder": false,
+                "parent_tag_id": 1,
+                "created_by": 1,
+                "inbox": true,
+                "metrics": false,
+                "publish": false,
+            }
+            
++ Response 201 (application/json)
+
+        {
+            "tag_id": 1,
+            "name": "Marketing Spam",
+            "is_folder": false,
+            "parent_tag_id": 1,
+            "created_by": 1,
+            "inbox": true,
+            "metrics": false,
+            "publish": false
+            "links": {
+                "self": { "href": "/workspace/1/tags/1" }
+            }
+        }
+
+## Tag [/workspace/{workspace_id}/tags/{tag_id}]
+
+### Get a tag [GET]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+
+        {
+            "tag_id": 1,
+            "name": "Marketing Posts",
+            "is_folder": false,
+            "parent_tag_id": 1,
+            "created_by": 1,
+            "inbox": true,
+            "metrics": true,
+            "publish": true
+            "links": {
+                "self": { "href": "/workspace/1/tags/1" }
+            }
+        }
+
+### Update a tag [PUT]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+    
+            {
+                "name": "Marketing Spam",
+                "is_folder": false,
+                "parent_tag_id": 1,
+                "created_by": 1,
+                "inbox": true,
+                "metrics": false,
+                "publish": false,
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "tag_id": 1,
+            "name": "Marketing Spam",
+            "is_folder": false,
+            "parent_tag_id": 1,
+            "created_by": 1,
+            "inbox": true,
+            "metrics": false,
+            "publish": false
+            "links": {
+                "self": { "href": "/workspace/1/tags/1" }
+            }
+        }
+
+### Delete a tag [DELETE]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 204
+
+# Group Stream Types
+
+## Stream Type Collection [/stream_types]
+
+### List stream types [GET]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+    + Attributes (StreamTypeCollection)
+    
+    + Body
+        
+            {
+               "stream_types": [
+                    {
+                    "stream_type_id": 1,
+                    "name": "Facebook",
+                    "_links": {
+                      "self": "/stream_types/1"
+                    },
+                    {
+                    "stream_type_id": 2,
+                    "name": "Twitter",
+                    "_links": {
+                      "self": "/stream_types/2"
+                    }
+                ],
+                "_links": {
+                    "self": { "href": "/stream_types" }
+                }
+            }
+
+## Stream Type [/stream_types/{stream_type_id}]
+
+### Get a stream type [GET]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+    + Attributes (StreamType)
+    
+    + Body
+        
+            {
+                "stream_type_id": 1,
+                "name": "Facebook",
+                "_links": {
+                    "self": "/stream_types/1"
+                }
+            }
+
+
+# Group Social Account Types
+
+## Social Account Types Collection [/social_account_types]
+
+### List social account types [GET]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+    + Attributes (SocialAccountTypeCollection)
+    
+    + Body
+        
+            {
+               "social_account_types": [
+                    {
+                    "social_account_type_id": 1,
+                    "name": "Facebook",
+                    "_links": {
+                      "self": "/social_account_types/1"
+                    },
+                    {
+                    "social_account_type_id": 2,
+                    "name": "Twitter",
+                    "_links": {
+                      "self": "/social_account_types/2"
+                    }
+                ],
+                "_links": {
+                    "self": { "href": "/social_account_types" }
+                }
+            }
+
+## Social Account Type [/social_account_types/{stream_type_id}]
+
+### Get a social account type [GET]
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response 200 (application/json)
+    + Attributes (SocialAccountType)
+    
+    + Body
+        
+            {
+                "social_account_type_id": 1,
+                "name": "Facebook",
+                "_links": {
+                    "self": "/social_account_types/1"
+                }
+            }
+
+# Data Structures
+
+## API Status Response (object)
++ status: `OK` (string, required) - The status of the API
++ version: `1.0` (string, required) - The current version of the API
+
+## Auth Request (object)
++ email: `foo@bar.com` (string, required) - The users email address
++ password: `f00b4r` (string, required) - The users password
+
+## Auth Response (object)
++ token: `a5616969-49bf-4c93-8fdc-78dc9134c399` (string,required) - The authorization token
++ expires: `2016-01-01 00:00:00` (string, required) - The timestamp at which the authorization token will expire
++ user_id: `1` (number,required) - The user id that the authorization token belongs to
++ company_id: `1` (number,required) - The company id that the user is a member of
+
+## Auth Deactivate Request (object)
++ token: `a5616969-49bf-4c93-8fdc-78dc9134c399` (string,required) - The authorization token
+
+## Avatar Crop Request (object)
++ avatar_id: `1` (number, required) - The id of the avatar that you wish to crop
++ top: `0` (number,required) - The offset from the top of the image in pixels
++ left: `0` (number,required) - The offset from the left side of the image in pixels
++ width: `200` (number,required) - The width of the crop area in pixels
++ height: `200` (number,required) - The height of the crop area in pixels
+
+## Avatar (object)
++ avatar_id: `1` (number, required) - The id of the avatar
++ original_name: `fooimage.jpg` (string, required) - The original name of the avatar image
++ image_type: `jpg` (enum[string], required) - The image extension
+    + Members 
+        + `jpg`
+        + `png`
+        + `gif`
++ created_by: `1` (number, required) the user who created the avatar
++ _links (object, required) - Linked resources
+    + self (object, required) - Self link to this resource
+        + href: `/avatars/1` (string, required)
+    + original (object, required)
+        + href: `/images/123.jpg` (string, required)
+    + small (object, required)
+        + href: `/images/234.jpg` (string, required)
+    + medium (object, required)
+        + href: `/images/345.jpg` (string, required)
+    + large (object, required)
+        + href: `/images/456.jpg` (string, required)
+
+## Avatar Collection (object)
++ avatars (array[Avatar], required) - An array of avatar resources
++ _links (object, required) - Linked resources
+    + self (object, required) - Self link to this resource
+        + href: `/avatars` (string, required)
+        
+## StreamType (object)
++ stream_type_id: `1` (number, required) - The id of the stream type
++ name: `Facebook` (string, required) - The name of the stream type
++ _links (object, required) - Linked resources
+    + self (object, required) - Self link to this resource
+        + href: `/stream_types/1` (string, required)
+        
+## StreamTypeCollection (object)
++ stream_types (array[StreamType],required) - An array of stream types
++ _links (object, required) - Linked resources
+    + self (object, required) - Self link to this resource
+        + href: `/stream_types` (string, required)
+
+## SocialAccountType (object)
++ social_account_type_id: `1` (number, required) - The id of the social account
++ name: `Facebook` (string, required) - The name of the stream type
++ _links (object, required) - Linked resources
+    + self (object, required) - Self link to this resource
+        + href: `/social_account_type/1` (string, required)
+        
+## SocialAccountTypeCollection (object)
++ social_accounts (array[SocialAccountType],required) - An array of social account types
++ _links (object, required) - Linked resources
+    + self (object, required) - Self link to this resource
+        + href: `/stream_types` (string, required)
+        
