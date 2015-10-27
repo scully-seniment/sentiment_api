@@ -900,8 +900,16 @@ Business hours are linked with a specific address, hence they are available as a
             "owner_id": 1,
             "active": true,
             "avatar": {
-                "url": "/images/c1_avatar.jpg",
-                "filename": "original_image.jpg"
+                "avatar_id": 1,
+                "original_name" : "some_image.jpg",
+                "created_by": 1,
+                "_links": {
+                    "self": { "href": "/avatar/1" }
+                    "original": { "href": "/images/o1_avatar.jpg" },
+                    "small": { "href": "/images/o1_avatar_small.jpg" },
+                    "medium": { "href": "/images/o1_avatar_medium.jpg" },
+                    "large": { "href": "/images/o1_avatar_medium.jpg" },
+                }
             },
             "address": {
                 "line 1": "Heston House",
