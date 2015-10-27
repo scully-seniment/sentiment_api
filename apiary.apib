@@ -2983,6 +2983,11 @@ TODO
 + expires: `2016-01-01 00:00:00` (string, required) - The timestamp at which the authorization token will expire
 + user_id: `1` (number,required) - The user id that the authorization token belongs to
 + company_id: `1` (number,required) - The company id that the user is a member of
++ _links (object, required) - Linked resources
+    + user (object, required) - Self link to this resource
+        + href: `/users/1` (string, required)
+    + company (object, required)
+        + href: `/companies/1` (string, required)    
 
 ## Auth Deactivate Request (object)
 + token: `a5616969-49bf-4c93-8fdc-78dc9134c399` (string,required) - The authorization token
