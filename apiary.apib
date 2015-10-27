@@ -1123,57 +1123,61 @@ Business hours are linked with a specific address, hence they are available as a
             
 + Response 200 (application/json)
 
-        [
-            {
-                "workspace_id": 1,
-                "name": "UK Workspace",
-                "description": "This is a workspace for our UK based accounts and streams",
-                "avatar": {
-                    "avatar_id": 5,
-                    "original_name" : "some_workspace_image.jpg",
-                    "urls": {
-                        "original": "/images/o1_avatar.jpg",
-                        "small": "/images/o1_avatar_small.jpg",
-                        "medium": "/images/o1_avatar_medium.jpg",
-                        "large": "/images/o1_avatar_medium.jpg",
+        {
+            "workspace": [
+                {
+                    "workspace_id": 1,
+                    "name": "UK Workspace",
+                    "description": "This is a workspace for our UK based accounts and streams",
+                    "avatar": {
+                        "avatar_id": 5,
+                        "original_name" : "some_workspace_image.jpg",
+                        "urls": {
+                            "original": "/images/o1_avatar.jpg",
+                            "small": "/images/o1_avatar_small.jpg",
+                            "medium": "/images/o1_avatar_medium.jpg",
+                            "large": "/images/o1_avatar_medium.jpg",
+                        },
+                        "created_by": 1
+                        "_links": {
+                            "self": "/avatar/5"
+                        }
                     },
-                    "created_by": 1
                     "_links": {
-                        "self": "/avatar/5"
+                        "self": "/workspace/1",
+                        "avatar": "/workspace/1/avatar",
+                        "user_access": "/workspace/1/user_access"
                     }
                 },
-                "_links": {
-                    "self": "/workspace/1",
-                    "avatar": "/workspace/1/avatar",
-                    "user_access": "/workspace/1/user_access"
-                }
-            },
-            {
-                "workspace_id": 2,
-                "name": "US Workspace",
-                "description": "This is a workspace for our US based accounts and streams",
-                "avatar": {
-                    "avatar_id": 7,
-                    "original_name" : "some_workspace_image2.jpg",
-                    "urls": {
-                        "original": "/images/o2_avatar.jpg",
-                        "small": "/images/o2_avatar_small.jpg",
-                        "medium": "/images/o2_avatar_medium.jpg",
-                        "large": "/images/o2_avatar_medium.jpg",
+                {
+                    "workspace_id": 2,
+                    "name": "US Workspace",
+                    "description": "This is a workspace for our US based accounts and streams",
+                    "avatar": {
+                        "avatar_id": 7,
+                        "original_name" : "some_workspace_image2.jpg",
+                        "urls": {
+                            "original": "/images/o2_avatar.jpg",
+                            "small": "/images/o2_avatar_small.jpg",
+                            "medium": "/images/o2_avatar_medium.jpg",
+                            "large": "/images/o2_avatar_medium.jpg",
+                        },
+                        "created_by": 1
+                        "_links": {
+                            "self": "/avatar/7"
+                        }
                     },
-                    "created_by": 1
                     "_links": {
-                        "self": "/avatar/7"
+                        "self": "/workspace/1",
+                        "avatar": "/workspace/1/avatar",
+                        "user_access": "/workspace/1/user_access"
                     }
-                },
-                "_links": {
-                    "self": "/workspace/1",
-                    "avatar": "/workspace/1/avatar",
-                    "user_access": "/workspace/1/user_access"
                 }
+            ],
+            "_links": {
+                "self" "/companies/1/workspace"
             }
-        ]
-
+        }
 
 # Group Partners
 
@@ -1193,58 +1197,63 @@ TODO
         
 + Response 200 (application/json)
 
-        [
-            {
-                "email": "foo@bar.com",
-                "forename": "Foo",
-                "surname": "Bar",
-                "system_admin": true,
-                "url": "/users/1,
-                "avatar": {
-                    "url": "/images/u1_avatar.jpg",
-                    "filename": "foo_image.jpg"
-                },
-                "workspaces": [
-                    {
-                        "name": "Workspace 1",
-                        "avatar": "images/w1_avatar.jpg",
-                        "url": "workspaces/1",
-                        "enabled": true
+        {
+            "users": [
+                {
+                    "email": "foo@bar.com",
+                    "forename": "Foo",
+                    "surname": "Bar",
+                    "system_admin": true,
+                    "url": "/users/1,
+                    "avatar": {
+                        "url": "/images/u1_avatar.jpg",
+                        "filename": "foo_image.jpg"
                     },
-                    {
-                        "name": "Workspace 2",
-                        "avatar": "images/w2_avatar.jpg",
-                        "url": "workspaces/2",
-                        "enabled": true
-                    }
-                ]
-            },
-            {
-                "email": "fruit@cake.com",
-                "forename": "Fruit",
-                "surname": "Cake",
-                "system_admin": false,
-                "url": "/users/2,
-                "avatar": {
-                    "url": "/images/u2_avatar.jpg",
-                    "filename": "fruit_image.jpg"
+                    "workspaces": [
+                        {
+                            "name": "Workspace 1",
+                            "avatar": "images/w1_avatar.jpg",
+                            "url": "workspaces/1",
+                            "enabled": true
+                        },
+                        {
+                            "name": "Workspace 2",
+                            "avatar": "images/w2_avatar.jpg",
+                            "url": "workspaces/2",
+                            "enabled": true
+                        }
+                    ]
                 },
-                "workspaces": [
-                    {
-                        "name": "Workspace 1",
-                        "avatar": "images/w1_avatar.jpg",
-                        "url": "workspaces/1",
-                        "enabled": true
+                {
+                    "email": "fruit@cake.com",
+                    "forename": "Fruit",
+                    "surname": "Cake",
+                    "system_admin": false,
+                    "url": "/users/2,
+                    "avatar": {
+                        "url": "/images/u2_avatar.jpg",
+                        "filename": "fruit_image.jpg"
                     },
-                    {
-                        "name": "Workspace 2",
-                        "avatar": "images/w2_avatar.jpg",
-                        "url": "workspaces/2",
-                        "enabled": false
-                    }
-                ]
+                    "workspaces": [
+                        {
+                            "name": "Workspace 1",
+                            "avatar": "images/w1_avatar.jpg",
+                            "url": "workspaces/1",
+                            "enabled": true
+                        },
+                        {
+                            "name": "Workspace 2",
+                            "avatar": "images/w2_avatar.jpg",
+                            "url": "workspaces/2",
+                            "enabled": false
+                        }
+                    ]
+                }
+            ],
+            "_links": {
+                "self": { "href": "/users" }
             }
-        ]
+        }
 
 + Response 403 (application/json)
 
@@ -1343,20 +1352,67 @@ TODO
             "forename": "Foo",
             "surname": "Bar",
             "system_admin": true,
-            "url": "/users/1,
-            "avatar": "/images/u1_avatar.jpg",
+            "avatar": {
+              "avatar_id": 1,
+              "original_name": "fooimage.jpg",
+              "image_type": "jpg",
+              "created_by": 1,
+              "_links": {
+                "self": { "href": "/avatars/1" },
+                "original": { "href": "/images/123.jpg" },
+                "small": { "href": "/images/234.jpg" },
+                "medium": { "href": "/images/345.jpg" },
+                "large": { "href": "/images/456.jpg" }
+              }
+            },
             "workspaces": [
                 {
-                    "name": "Workspace 1",
-                    "avatar": "images/w1_avatar.jpg",
-                    "url": "workspaces/1",
-                    "enabled": true
+                    "workspace_id": 1,
+                    "name": "UK Workspace",
+                    "description": "This is a workspace for our UK based accounts and streams",
+                    "avatar": {
+                        "avatar_id": 5,
+                        "original_name" : "some_workspace_image.jpg",
+                        "urls": {
+                            "original": "/images/o1_avatar.jpg",
+                            "small": "/images/o1_avatar_small.jpg",
+                            "medium": "/images/o1_avatar_medium.jpg",
+                            "large": "/images/o1_avatar_medium.jpg",
+                        },
+                        "created_by": 1
+                        "_links": {
+                            "self": "/avatar/5"
+                        }
+                    },
+                    "_links": {
+                        "self": "/workspace/1",
+                        "avatar": "/workspace/1/avatar",
+                        "user_access": "/workspace/1/user_access"
+                    }
                 },
                 {
-                    "name": "Workspace 2",
-                    "avatar": "images/w2_avatar.jpg",
-                    "url": "workspaces/2",
-                    "enabled": true
+                    "workspace_id": 2,
+                    "name": "US Workspace",
+                    "description": "This is a workspace for our US based accounts and streams",
+                    "avatar": {
+                        "avatar_id": 7,
+                        "original_name" : "some_workspace_image2.jpg",
+                        "urls": {
+                            "original": "/images/o2_avatar.jpg",
+                            "small": "/images/o2_avatar_small.jpg",
+                            "medium": "/images/o2_avatar_medium.jpg",
+                            "large": "/images/o2_avatar_medium.jpg",
+                        },
+                        "created_by": 1
+                        "_links": {
+                            "self": "/avatar/7"
+                        }
+                    },
+                    "_links": {
+                        "self": "/workspace/1",
+                        "avatar": "/workspace/1/avatar",
+                        "user_access": "/workspace/1/user_access"
+                    }
                 }
             ],
             "_links": {
@@ -1392,8 +1448,19 @@ TODO
             "forename": "Cherry",
             "surname": "Pie",
             "system_admin": true,
-            "url": "/users/1,
-            "avatar": "/images/u1_avatar.jpg",
+            "avatar": {
+              "avatar_id": 1,
+              "original_name": "fooimage.jpg",
+              "image_type": "jpg",
+              "created_by": 1,
+              "_links": {
+                "self": { "href": "/avatars/1" },
+                "original": { "href": "/images/123.jpg" },
+                "small": { "href": "/images/234.jpg" },
+                "medium": { "href": "/images/345.jpg" },
+                "large": { "href": "/images/456.jpg" }
+              }
+            },
             "workspace": [
                 {
                     "workspace_id": 1,
@@ -1515,56 +1582,63 @@ TODO
             
 + Response 200 (application/json)
 
-        [
-            {
-                "workspace_id": 1,
-                "name": "UK Workspace",
-                "description": "This is a workspace for our UK based accounts and streams",
-                "avatar": {
-                    "avatar_id": 5,
-                    "original_name" : "some_workspace_image.jpg",
-                    "urls": {
-                        "original": "/images/o1_avatar.jpg",
-                        "small": "/images/o1_avatar_small.jpg",
-                        "medium": "/images/o1_avatar_medium.jpg",
-                        "large": "/images/o1_avatar_medium.jpg",
+        {
+            [
+                {
+                    "workspace_id": 1,
+                    "name": "UK Workspace",
+                    "description": "This is a workspace for our UK based accounts and streams",
+                    "access": true,
+                    "avatar": {
+                        "avatar_id": 5,
+                        "original_name" : "some_workspace_image.jpg",
+                        "urls": {
+                            "original": "/images/o1_avatar.jpg",
+                            "small": "/images/o1_avatar_small.jpg",
+                            "medium": "/images/o1_avatar_medium.jpg",
+                            "large": "/images/o1_avatar_medium.jpg",
+                        },
+                        "created_by": 1
+                        "_links": {
+                            "self": "/avatar/5"
+                        }
                     },
-                    "created_by": 1
                     "_links": {
-                        "self": "/avatar/5"
+                        "self": "/workspace/1",
+                        "avatar": "/workspace/1/avatar",
+                        "user_access": "/workspace/1/user_access"
                     }
                 },
-                "_links": {
-                    "self": "/workspace/1",
-                    "avatar": "/workspace/1/avatar",
-                    "user_access": "/workspace/1/user_access"
-                }
-            },
-            {
-                "workspace_id": 2,
-                "name": "US Workspace",
-                "description": "This is a workspace for our US based accounts and streams",
-                "avatar": {
-                    "avatar_id": 7,
-                    "original_name" : "some_workspace_image2.jpg",
-                    "urls": {
-                        "original": "/images/o2_avatar.jpg",
-                        "small": "/images/o2_avatar_small.jpg",
-                        "medium": "/images/o2_avatar_medium.jpg",
-                        "large": "/images/o2_avatar_medium.jpg",
+                {
+                    "workspace_id": 2,
+                    "name": "US Workspace",
+                    "description": "This is a workspace for our US based accounts and streams",
+                    "access": false,
+                    "avatar": {
+                        "avatar_id": 7,
+                        "original_name" : "some_workspace_image2.jpg",
+                        "urls": {
+                            "original": "/images/o2_avatar.jpg",
+                            "small": "/images/o2_avatar_small.jpg",
+                            "medium": "/images/o2_avatar_medium.jpg",
+                            "large": "/images/o2_avatar_medium.jpg",
+                        },
+                        "created_by": 1
+                        "_links": {
+                            "self": "/avatar/7"
+                        }
                     },
-                    "created_by": 1
                     "_links": {
-                        "self": "/avatar/7"
+                        "self": "/workspace/1",
+                        "avatar": "/workspace/1/avatar",
+                        "user_access": "/workspace/1/user_access"
                     }
-                },
-                "_links": {
-                    "self": "/workspace/1",
-                    "avatar": "/workspace/1/avatar",
-                    "user_access": "/workspace/1/user_access"
                 }
+            ],
+            "_links": {
+                "self": { "href": "/user/{user_id}/workspace" }
             }
-        ]
+        }
 
 
 # Group Workspace
@@ -1743,6 +1817,57 @@ TODO
             
 + Response 204
 
+# Group Workspace > Avatar
+
+## Workspace > Avatar [/workspace/{workspace_id}/avatar]
+
+### Select a workspace avatar [POST]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+    
+            {
+                "avatar_id": 1
+            }
+
++ Response 200 (application/json)
+
+        {
+            "avatar_id": 1,
+            "original_name" : "some_image.jpg",
+            "urls": {
+                "original": "/images/o1_avatar.jpg",
+                "small": "/images/o1_avatar_small.jpg",
+                "medium": "/images/o1_avatar_medium.jpg",
+                "large": "/images/o1_avatar_medium.jpg",
+            },
+            "created_by": 1
+            "_links": {
+                "self": "/avatar/1"
+            }
+        }
+    
++ Response 404
+
+        {
+            "error": "Avatar not found"
+        }
+     
+        
+### Deselect a workspace avatar [DELETE]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 204
 
 # Group Workspace > Roles
 
