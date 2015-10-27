@@ -315,7 +315,7 @@ Allows a user to crop an avatar, using the `top` and `left` properties to define
 
 Addresses are stored in a independant top level resource. They are then linked to `companies` using the following endpoint:
 
-* **`PUT /companies/{company_id}/address`**
+* **`POST /address`**
 
 ## Address Collection [/address]
 
@@ -597,128 +597,145 @@ Business hours are linked with a specific address, hence they are available as a
         
 + Response 200 (application/json)
 
-        [
-            {
-                "company_id": 1,
-                "name": "Andrew's Widgets Ltd",
-                "created_time": "2015-05-01 00:00:00",
-                "total_licences": 10,
-                "owner_id": 1,
-                "active": true,
-                "avatar": {
-                    "avatar_id": 1,
-                    "original_name" : "some_image.jpg",
-                    "urls": {
-                        "original": "/images/o1_avatar.jpg",
-                        "small": "/images/o1_avatar_small.jpg",
-                        "medium": "/images/o1_avatar_medium.jpg",
-                        "large": "/images/o1_avatar_medium.jpg",
-                    },
-                    "created_by": 1
-                },
-                "address": {
-                    "line 1": "Heston House",
-                    "line 2": "30 St Mary Axe",
-                    "line 3": "",
-                    "line 4": "",
-                    "locality": "City of London",
-                    "region": "Lodon",
-                    "zipcode": "SE16 4BD",
-                    "country": "United Kingdom",
-                    "timezone": "London/Europe",
-                    "business_hours": {
-                        "monday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "tuesday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "wednesday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "thursday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "friday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "saturday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "sunday":{
-                            "open": "09:00",
-                            "close": "16:00"
+        {
+            "companies": [
+                {
+                    "company_id": 1,
+                    "name": "Andrew's Widgets Ltd",
+                    "created_time": "2015-05-01 00:00:00",
+                    "total_licences": 10,
+                    "owner_id": 1,
+                    "active": true,
+                    "avatar": {
+                        "avatar_id": 1,
+                        "original_name" : "some_image.jpg",
+                        "created_by": 1,
+                        "_links": {
+                            "self": { "href": "/avatar/1" }
+                            "original": { "href": "/images/o1_avatar.jpg" },
+                            "small": { "href": "/images/o1_avatar_small.jpg" },
+                            "medium": { "href": "/images/o1_avatar_medium.jpg" },
+                            "large": { "href": "/images/o1_avatar_medium.jpg" },
                         }
+                    },
+                    "address": {
+                        "line 1": "Heston House",
+                        "line 2": "30 St Mary Axe",
+                        "line 3": "",
+                        "line 4": "",
+                        "locality": "City of London",
+                        "region": "Lodon",
+                        "zipcode": "SE16 4BD",
+                        "country": "United Kingdom",
+                        "timezone": "London/Europe",
+                        "business_hours": {
+                            "monday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "tuesday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "wednesday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "thursday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "friday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "saturday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "sunday":{
+                                "open": "09:00",
+                                "close": "16:00"
+                            }
+                        }
+                    },
+                    "_links": {
+                        "self": { "href": "/companies/2" },
+                        "avatar": { "href": "/companies/2/avatar" },
+                        "address": { "href": "/companies/2/address" },
+                    }
+                },
+                {
+                    "company_id": 2,
+                    "name": "Leon's Laser Crop",
+                    "created_time": "2015-05-01 00:00:00",
+                    "total_licences": 20,
+                    "owner_id": 5,
+                    "active": true,
+                    "avatar": {
+                        "avatar_id": 2,
+                        "original_name" : "some_other_image.jpg",
+                        "created_by": 5,
+                        "_links": {
+                            "self": { "href": "/avatar/2" }
+                            "original": { "href": "/images/o2_avatar.jpg" },
+                            "small": { "href": "/images/o2_avatar_small.jpg" },
+                            "medium": { "href": "/images/o2_avatar_medium.jpg" },
+                            "large": { "href": "/images/o2_avatar_medium.jpg" },
+                        }
+                    },
+                    "address": {
+                        "line 1": "The Light House",
+                        "line 2": "15 Fowler Avenue",
+                        "line 3": "",
+                        "line 4": "",
+                        "locality": "Farnborough",
+                        "region": "Hampshire",
+                        "zipcode": "GU31 3FV",
+                        "country": "United Kingdom",
+                        "timezone": "London/Europe",
+                        "business_hours": {
+                            "monday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "tuesday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "wednesday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "thursday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "friday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "saturday":{
+                                "open": "09:00",
+                                "close": "17:00"
+                            },
+                            "sunday":{
+                                "open": "09:00",
+                                "close": "16:00"
+                            }
+                        }
+                    },
+                    "_links": {
+                        "self": { "href": "/companies/2" },
+                        "avatar": { "href": "/companies/2/avatar" },
+                        "address": { "href": "/companies/2/address" },
                     }
                 }
-            },
-            {
-                "company_id": 2,
-                "name": "Leon's Laser Crop",
-                "created_time": "2015-05-01 00:00:00",
-                "total_licences": 20,
-                "owner_id": 5,
-                "active": true,
-                "avatar": {
-                    "avatar_id": 2,
-                    "original_name" : "some_image.jpg",
-                    "urls": {
-                        "original": "/images/o2_avatar.jpg",
-                        "small": "/images/o2_avatar_small.jpg",
-                        "medium": "/images/o2_avatar_medium.jpg",
-                        "large": "/images/o2_avatar_medium.jpg",
-                    },
-                    "created_by": 5
-                },
-                "address": {
-                    "line 1": "The Light House",
-                    "line 2": "15 Fowler Avenue",
-                    "line 3": "",
-                    "line 4": "",
-                    "locality": "Farnborough",
-                    "region": "Hampshire",
-                    "zipcode": "GU31 3FV",
-                    "country": "United Kingdom",
-                    "timezone": "London/Europe",
-                    "business_hours": {
-                        "monday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "tuesday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "wednesday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "thursday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "friday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "saturday":{
-                            "open": "09:00",
-                            "close": "17:00"
-                        },
-                        "sunday":{
-                            "open": "09:00",
-                            "close": "16:00"
-                        }
-                    }
-                },
+            ],
+            "_links": {
+                "self": { "href": "/companies" }
             }
-        ]
+        }
 
 + Response 403 (application/json)
 
@@ -749,7 +766,7 @@ Business hours are linked with a specific address, hence they are available as a
 
     + Headers
         
-            Location: /users/3
+            Location: /companies/2
             
     + Body
     
@@ -798,13 +815,14 @@ Business hours are linked with a specific address, hence they are available as a
             "avatar": {
                 "avatar_id": 1,
                 "original_name" : "some_image.jpg",
-                "urls": {
-                    "original": "/images/o1_avatar.jpg",
-                    "small": "/images/o1_avatar_small.jpg",
-                    "medium": "/images/o1_avatar_medium.jpg",
-                    "large": "/images/o1_avatar_medium.jpg",
-                },
-                "created_by": 1
+                "created_by": 5,
+                "_links": {
+                    "self": { "href": "/avatar/1" }
+                    "original": { "href": "/images/o1_avatar.jpg" },
+                    "small": { "href": "/images/o1_avatar_small.jpg" },
+                    "medium": { "href": "/images/o1_avatar_medium.jpg" },
+                    "large": { "href": "/images/o1_avatar_medium.jpg" },
+                }
             },
             "address": {
                 "address_id": 1,
