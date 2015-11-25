@@ -1869,6 +1869,56 @@ TODO
 
 + Response 204
 
+
+# Group Workspace > Publish
+
+## Workspace > Publish Collection [/workspace/{workspace_id}/publish]
+
+### List all published messages [GET]
+
++ Parameters
+    + type:  `all` (enum[string], optional)
+        
+        The type will determine if past, future or all messages are returned
+        
+        +Default: `all`
+
+        + Members
+            + `all` - Return all mentions, past and future
+            + `scheduled` - Return only messages scheduled for the future
+            + `sent` - Return only messages that have already been sent
+            + `error` - Return only message that were unable to be sent due to an error.
+            
+    + date_from: `2015-10-22T01:10:00+01:00` (string, optional)
+    + date_to: `2015-11-22T01:10:00+01:00` (string, optional)
+    
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
++ Response (application/json)
+
+    {
+        "publish_collection": [
+        
+        ]
+    }
+
+
+
+### Create a new published message [POST]
+
+## Workspace > Publish [/workspace/{workspace_id}/publish/{publish_id}]
+
+### Get a published message [GET]
+
+### Update an existing published message [PUT]
+
+### Delete a published message [DELETE]
+
+
 # Group Workspace > Roles
 
 ## Workspace > Roles Collection [/workspace/{workspace_id}/roles{?stub}]
