@@ -1183,6 +1183,33 @@ Business hours are linked with a specific address, hence they are available as a
 
 TODO
 
+# Group Languages
+
+## Languages Collection [/languages]
+
+### List Languages [GET]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+
++ Response 200 (application/json)
+
+        {
+            "languages" [
+                {
+                    "code": "en-gb",
+                    "name": "English (British)",
+                },
+                {
+                    "code": "fr",
+                    "name": "French",
+                }
+            ]
+        }
+
 # Group Users
 
 ## Users Collection [/users]
@@ -1559,7 +1586,7 @@ TODO
 
 # Group User > Language
 
-## User > Avatar [/users/{user_id}/language]
+## User > Language [/users/{user_id}/language]
 
 ### Select a user avatar [PUT]
 
@@ -1572,13 +1599,13 @@ TODO
     + Body
     
             {
-                "language": "en"
+                "code": "en-gb"
             }
 
 + Response 200 (application/json)
 
         {
-           "language": "en-gb",
+           "code": "en-gb",
            "name": "English (British)"
         }
     
