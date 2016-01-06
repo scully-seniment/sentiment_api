@@ -1557,6 +1557,38 @@ TODO
 + Response 204
 
 
+# Group User > Language
+
+## User > Avatar [/users/{user_id}/language]
+
+### Select a user avatar [PUT]
+
++ Request (application/json)
+
+    + Headers
+        
+            Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
+            
+    + Body
+    
+            {
+                "language": "en"
+            }
+
++ Response 200 (application/json)
+
+        {
+           "language": "en-gb",
+           "name": "English (British)"
+        }
+    
++ Response 404
+
+        {
+            "error": "Language not found"
+        }
+
+
 # Group User > Workspace
 
 ## User > Workspace Collection [/users/{user_id}/workspace{?stub}]
@@ -1898,7 +1930,7 @@ TODO
         
             Authorization: Basic a5616969-49bf-4c93-8fdc-78dc9134c399
             
-+ Response (application/json)
++ Response 200 (application/json)
 
     {
         "publish_collection": [
